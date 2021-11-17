@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class CircularMenuItem extends StatelessWidget {
   /// if icon and animatedIcon are passed, icon will be ignored
+  final Widget? item;
   final IconData? icon;
   final Color? color;
   final Color? iconColor;
@@ -22,35 +23,39 @@ class CircularMenuItem extends StatelessWidget {
   final Color? badgeColor;
 
   /// if animatedIcon and icon are passed, icon will be ignored
+  @Deprecated('Use item instead')
   final AnimatedIcon? animatedIcon;
 
   /// creates a menu item .
   /// [onTap] must not be null.
   /// [padding] and [margin]  must be equal or greater than zero.
-  CircularMenuItem({
-    required this.onTap,
-    this.icon,
-    this.color,
-    this.iconSize = 30,
-    this.boxShadow,
-    this.iconColor,
-    this.animatedIcon,
-    this.padding = 10,
-    this.margin = 10,
-    this.enableBadge = false,
-    this.badgeBottomOffet,
-    this.badgeLeftOffet,
-    this.badgeRightOffet,
-    this.badgeTopOffet,
-    this.badgeRadius,
-    this.badgeTextStyle,
-    this.badgeLabel,
-    this.badgeTextColor,
-    this.badgeColor,
-  })  : assert(padding >= 0.0),
-        assert(margin >= 0.0);
+  CircularMenuItem(
+      {required this.onTap,
+        this.item,
+        @Deprecated('Use item instead') this.animatedIcon,
+        this.icon,
+        this.color,
+        this.iconSize = 30,
+        this.boxShadow,
+        this.iconColor,
+        this.padding = 10,
+        this.margin = 10,
+        this.enableBadge = false,
+        this.badgeBottomOffet,
+        this.badgeLeftOffet,
+        this.badgeRightOffet,
+        this.badgeTopOffet,
+        this.badgeRadius,
+        this.badgeTextStyle,
+        this.badgeLabel,
+        this.badgeTextColor,
+        this.badgeColor})
+      : assert(padding >= 0.0),
+        assert(margin >= 0.0),
+        assert(item == null || icon == null,
+        'You can\'t use item and icon at the same time!');
 
-  Widget _buildCircularMenuItem(BuildContext context) {
+  Widget _buildCircularMenuItem(BuildContext context, Widget? _item) {
     return Container(
       margin: EdgeInsets.all(margin),
       decoration: BoxDecoration(
@@ -70,13 +75,13 @@ class CircularMenuItem extends StatelessWidget {
           child: InkWell(
             child: Padding(
               padding: EdgeInsets.all(padding),
-              child: animatedIcon == null
+              child: _item == null
                   ? Icon(
                       icon,
                       size: iconSize,
                       color: iconColor ?? Colors.white,
                     )
-                  : animatedIcon,
+                  : _item,
             ),
             onTap: onTap,
           ),
@@ -85,7 +90,7 @@ class CircularMenuItem extends StatelessWidget {
     );
   }
 
-  Widget _buildCircularMenuItemWithBadge(BuildContext context) {
+  Widget _buildCircularMenuItemWithBadge(BuildContext context, Widget? _item) {
     return _Badge(
       color: badgeColor,
       bottomOffset: badgeBottomOffet,
@@ -97,15 +102,16 @@ class CircularMenuItem extends StatelessWidget {
       onTap: onTap,
       textColor: badgeTextColor,
       label: badgeLabel,
-      child: _buildCircularMenuItem(context),
+      child: _buildCircularMenuItem(context, _item),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget? _item = animatedIcon ?? item;
     return enableBadge
-        ? _buildCircularMenuItemWithBadge(context)
-        : _buildCircularMenuItem(context);
+        ? _buildCircularMenuItemWithBadge(context, _item)
+        : _buildCircularMenuItem(context, _item);
   }
 }
 
